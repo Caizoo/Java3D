@@ -1,0 +1,83 @@
+#version 400 core
+
+in vec2 pass_textureCoords;
+in vec3 surfaceNormal;
+in vec3 toLightVector[4];
+in vec3 toCameraVector;
+in float visibility;
+in vec4 shadowCoords;
+
+out vec4 out_Colour;
+
+uniform sampler2D grassTexture;
+uniform sampler2D grass2Texture;
+uniform sampler2D mudTexture;
+uniform sampler2D rockTexture;
+uniform sampler2D shadowMap;
+
+uniform vec3 lightColour[4];
+uniform vec3 attenuation[4];
+uniform float shineDamper;
+uniform float reflectivity;
+uniform vec3 skyColour;
+
+void main(void) {
+
+	float objectNearestLight = texture(shadowMap, shadowCoords.xy).r;
+	float lightFactor = 1.0;
+	if(shadowCoords.z > objectNearestLight) {
+		lightFactor = 1.0 - 0.4;
+	}
+
+	float grassBlend = 0;
+	float grass2Blend = 0;
+	float mudBlend = 0;
+	float rockBlend = 0;
+
+	vec3 unitNormal = normalize(surfaceNormal);
+	vec3 unitVectorToCamera = normalize(toCameraVector);
+	
+	vec3 normalUp = vec3(0.0,1.0,0.0);
+	float degreeOfAngle = ((dot(unitNormal, normalUp))*-1f) + 1f; //where 0 is flat, 1 is vertical
+	
+	if(degreeOfAngle <= 0.5f) {
+		grassBlend = 1f;
+	}else if(degreeOfAngle > 0.5f && degreeOfAngle < 0.58f){
+		float blend = (0.58f - degreeOfAngle) / 0.08f;
+		grassBlend = blend;
+		rockBlend = (blend * -1f) + 1f;
+	}else{
+		rockBlend = 1f;
+	}	
+	
+	vec2 tiledCoords = pass_textureCoords * 30;
+	vec4 grassTextureColour = texture(grassTexture,tiledCoords) * grassBlend;
+	vec4 grass2TextureColour = texture(grass2Texture,tiledCoords) * 0;
+	vec4 mudTextureColour = texture(mudTexture,tiledCoords) * 0;
+	vec4 rockTextureColour = texture(rockTexture,tiledCoords) * rockBlend;
+	
+	vec4 totalColour = grassTextureColour + grass2TextureColour + mudTextureColour + rockTextureColour;
+	
+	vec3 totalDiffuse = vec3(0.0);
+	vec3 totalSpecular = vec3(0.0);
+	
+	for(int i=0;i<4;i++) {
+		float distance = length(toLightVector[i]);
+		float attFactor = attenuation[i].x + (attenuation[i].y * distance) + (attenuation[i].z * distance * distance);
+		vec3 unitLightVector = normalize(toLightVector[i]);
+		float nDot1 = dot(unitNormal,unitLightVector);
+		float brightness = max(nDot1,0.0);
+		totalDiffuse = totalDiffuse + (brightness * lightColour[i])/attFactor;
+		vec3 lightDirection = -unitLightVector;
+		vec3 reflectedLightDirection = reflect(lightDirection, unitNormal);
+		float specularFactor = dot(reflectedLightDirection, unitVectorToCamera);
+		specularFactor = max(specularFactor,0.0);
+		float dampedFactor = pow(specularFactor,shineDamper);
+		totalSpecular = totalSpecular + (dampedFactor * reflectivity * lightColour[i])/attFactor;
+	}
+	totalDiffuse = max(totalDiffuse, 0.2) * lightFactor;
+	
+	out_Colour = vec4(totalDiffuse,1.0) * totalColour + vec4(totalSpecular,1.0);
+	out_Colour = mix(vec4(skyColour,1.0), out_Colour, visibility);
+
+}

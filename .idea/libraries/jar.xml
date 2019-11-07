@@ -1,0 +1,24 @@
+<component name="libraryTable">
+  <library name="jar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/jar/substance-7.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/lwjgl_util.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/PNGDecoder.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/laf-plugin-7.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/jinput.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/log4j-api-2.0-beta9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/asm-debug-all.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/lwjgl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/lwjgl_util_applet.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/lzma.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/lwjgl-debug.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/trident-7.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/laf-widget-7.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/lwjgl_test.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/slick-util.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/AppleJavaExtensions.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
